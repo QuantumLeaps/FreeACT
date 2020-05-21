@@ -23,7 +23,7 @@ FreeAct/
 +-inc/             - include directory
 | +-FreeAct.h      - FreeAct interface
 +-src/             - source directory
-| +-FreeAct.h      - FreeAct implementation
+| +-FreeAct.c      - FreeAct implementation
 ```
 
 ---------------------------------------------------------------------
