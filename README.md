@@ -4,7 +4,7 @@ FreeRTOS kernel. FreeAct implemetns the Active Object design pattern.
 It was originally presented by Miro Samek at the
 [Embedded Online Conference 2020](https://www.embeddedonlineconference.com/session/Modern_Embedded_Software_Goes_Beyond_the_RTOS)
 
-![Miro Samek at Embedded Online Conference](img/EOC_Miro.png)
+[![Miro Samek at Embedded Online Conference](img/EOC_Miro.png)](https://www.embeddedonlineconference.com/session/Modern_Embedded_Software_Goes_Beyond_the_RTOS)
 
 
 ---------------------------------------------------------------------
