@@ -30,8 +30,13 @@ FreeAct/
 
 ---------------------------------------------------------------------
 # Licensing
-FreeAct is licensed under the MIT open source license, which is the same
+FreeAct is [licensed](LICENSE.txt) under the MIT open source license, which is the same
 used in FreeRTOS.
+
+
+---------------------------------------------------------------------
+# Comments/Discussion
+If you'd like to discuss FreeAct or related subjects, plese use the ["Issues" tab](https://github.com/QuantumLeaps/FreeAct/issues).
 
 
 ---------------------------------------------------------------------
