@@ -2,7 +2,7 @@ The FreeAct real-time embedded framework is released under the MIT open source
 license, the text of which is provided below.
 
 This license covers the FreeAct kernel source files, which are located in the
-inc/ and src/ directories.  It also covers the demo application projects, which are
+inc/ and src/ directories. It also covers the example projects, which are
 located in the examples/ directory.
 
 The 3rd_party/ directory includes third party software that is not part of
@@ -11,7 +11,6 @@ includes FreeRTOS, CMSIS, as well as files provided by chip or tools vendors, et
 
 License text:
 -------------
-
 Copyright (C) 2020 Quantum Leaps, LLC.  All Rights Reserved.
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
