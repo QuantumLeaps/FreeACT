@@ -75,7 +75,8 @@ int main() {
                  blinkyButton_queue,
                  sizeof(blinkyButton_queue)/sizeof(blinkyButton_queue[0]),
                  blinkyButton_stack,
-                 sizeof(blinkyButton_stack)/sizeof(blinkyButton_stack[0]));
+                 sizeof(blinkyButton_stack),
+                 0U);
 
     BSP_start(); /* configure and start interrupts */
 

@@ -62,12 +62,17 @@ static void Active_eventLoop(void *pvParameters) {
 
 /*..........................................................................*/
 void Active_start(Active * const me,
-                  uint8_t prio,
+                  uint8_t prio,       /* priority (1-based) */
                   Event **queueSto,
                   uint32_t queueLen,
-                  StackType_t *stackSto,
-                  uint32_t stackDepth)
+                  void *stackSto,
+                  uint32_t stackSize,
+                  uint16_t opt)
 {
+    StackType_t *stk_sto = stackSto;
+    uint32_t stk_depth = (stackSize / sizeof(StackType_t));
+
+    (void)opt; /* unused parameter */
     me->queue = xQueueCreateStatic(
                    queueLen,            /* queue length - provided by user */
                    sizeof(Event *),     /* item size */
@@ -78,10 +83,10 @@ void Active_start(Active * const me,
     me->thread = xTaskCreateStatic(
               &Active_eventLoop,        /* the thread function */
               "AO" ,                    /* the name of the task */
-              stackDepth,               /* stack depth */
+              stk_depth,                /* stack depth */
               me,                       /* the 'pvParameters' parameter */
               prio + tskIDLE_PRIORITY,  /* FreeRTOS priority */
-              stackSto,                 /* stack storage - provided by user */
+              stk_sto,                  /* stack storage - provided by user */
               &me->thread_cb);          /* task control block */
     configASSERT(me->thread); /* thread must be created */
 }
