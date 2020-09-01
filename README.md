@@ -7,6 +7,11 @@ It was originally presented by Miro Samek at the
 [![Miro Samek at Embedded Online Conference](img/EOC_Miro.png)](https://www.embeddedonlineconference.com/session/Modern_Embedded_Software_Goes_Beyond_the_RTOS)
 
 
+This presentation has been also made available on YouTube in the following playlist:
+
+https://www.youtube.com/playlist?list=PLPW8O6W-1chytjkg63-tM7MI0BvGxxPIP
+
+
 ---------------------------------------------------------------------
 # Directories and Files
 
