@@ -9,7 +9,7 @@ It was originally presented by Miro Samek at the
 
 This presentation has been also made available on YouTube in the following playlist:
 
-https://www.youtube.com/playlist?list=PLPW8O6W-1chytjkg63-tM7MI0BvGxxPIP
+[![Beyond the RTOS on YouTube](img/Beyond_the_RTOS.jpg)](https://www.youtube.com/playlist?list=PLPW8O6W-1chytjkg63-tM7MI0BvGxxPIP)
 
 
 ---------------------------------------------------------------------
