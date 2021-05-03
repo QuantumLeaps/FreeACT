@@ -1,3 +1,6 @@
+![FreeACT](img/FreeACT.png)
+
+
 # What is it?
 "FreeAct" is a minimal real-time embedded framework (RTEF) based on the
 FreeRTOS kernel. FreeAct implemetns the Active Object design pattern.
