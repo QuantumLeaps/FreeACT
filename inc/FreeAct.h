@@ -37,6 +37,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "timers.h"
 
 /*---------------------------------------------------------------------------*/
 /* Event facilities... */
@@ -47,6 +48,11 @@ enum ReservedSignals {
     INIT_SIG, /* dispatched to AO before entering event-loop */
     USER_SIG  /* first signal available to the users */
 };
+
+typedef enum {
+    TYPE_ONE_SHOT = pdFALSE,    /* One-shot timer */
+    TYPE_PERIODIC = pdTRUE      /* Periodic timer */
+} TimerType_t;
 
 /* Event base class */
 typedef struct {
@@ -91,14 +97,15 @@ void Active_postFromISR(Active * const me, Event const * const e,
 
 /* Time Event class */
 typedef struct {
-    Event super;       /* inherit Event */
-    Active *act;       /* the AO that requested this TimeEvent */
-    uint32_t timeout;  /* timeout counter; 0 means not armed */
-    uint32_t interval; /* interval for periodic TimeEvent, 0 means one-shot */
+    Event super;                /* inherit Event */
+    Active *act;                /* the AO that requested this TimeEvent */
+    TimerHandle_t timer;        /* private timer handle */
+    StaticTimer_t timer_cb;     /* timer control-block (FreeRTOS static alloc) */
+    TimerType_t type;           /* timer type, periodic or one-shot */
 } TimeEvent;
 
 void TimeEvent_ctor(TimeEvent * const me, Signal sig, Active *act);
-void TimeEvent_arm(TimeEvent * const me, uint32_t timeout, uint32_t interval);
+void TimeEvent_arm(TimeEvent * const me, uint32_t millisec);
 void TimeEvent_disarm(TimeEvent * const me);
 
 /* static (i.e., class-wide) operation */

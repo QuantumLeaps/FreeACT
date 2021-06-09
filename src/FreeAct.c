@@ -78,7 +78,7 @@ void Active_start(Active * const me,
                    sizeof(Event *),     /* item size */
                    (uint8_t *)queueSto, /* queue storage - provided by user */
                    &me->queue_cb);      /* queue control block */
-    configASSERT(me->queue); /* queue must be created */
+    configASSERT(me->queue);            /* queue must be created */
 
     me->thread = xTaskCreateStatic(
               &Active_eventLoop,        /* the thread function */
@@ -88,7 +88,7 @@ void Active_start(Active * const me,
               prio + tskIDLE_PRIORITY,  /* FreeRTOS priority */
               stk_sto,                  /* stack storage - provided by user */
               &me->thread_cb);          /* task control block */
-    configASSERT(me->thread); /* thread must be created */
+    configASSERT(me->thread);           /* thread must be created */
 }
 
 /*..........................................................................*/
@@ -108,54 +108,73 @@ void Active_postFromISR(Active * const me, Event const * const e,
 
 /*--------------------------------------------------------------------------*/
 /* Time Event services... */
-
-static TimeEvent *l_tevt[10]; /* all TimeEvents in the application */
-static uint_fast8_t l_tevtNum; /* current number of TimeEvents */
+static void TimeEvent_callback(TimerHandle_t xTimer);
 
 /*..........................................................................*/
 void TimeEvent_ctor(TimeEvent * const me, Signal sig, Active *act) {
     /* no critical section because it is presumed that all TimeEvents
-    * are created *before* multitasking has started.
-    */
+     * are created *before* multitasking has started.
+     */
     me->super.sig = sig;
     me->act = act;
-    me->timeout = 0U;
-    me->interval = 0U;
 
-    /* register one more TimeEvent with the application */
-    configASSERT(l_tevtNum < sizeof(l_tevt)/sizeof(l_tevt[0]));
-    l_tevt[l_tevtNum] = me;
-    ++l_tevtNum;
+    /* Create a timer object */
+    me->timer = xTimerCreateStatic("TE", 1U, me->type, me,
+                                   TimeEvent_callback, &me->timer_cb);
+    configASSERT(me->timer);            /* timer must be created */
 }
 
 /*..........................................................................*/
-void TimeEvent_arm(TimeEvent * const me, uint32_t timeout, uint32_t interval) {
-    taskENTER_CRITICAL();
-    me->timeout = timeout;
-    me->interval = interval;
-    taskEXIT_CRITICAL();
+void TimeEvent_arm(TimeEvent * const me, uint32_t millisec) {
+    TickType_t ticks;
+    BaseType_t status;
+    BaseType_t xHigherPriorityTaskWoken;
+
+    ticks = (millisec / portTICK_PERIOD_MS);
+    if (ticks == 0U) {
+        ticks = 1U;
+    }
+
+    if (xPortIsInsideInterrupt() == pdTRUE) {
+        xHigherPriorityTaskWoken = pdFALSE;
+
+        status = xTimerChangePeriodFromISR(me->timer, ticks, &xHigherPriorityTaskWoken);
+        configASSERT(status == pdPASS);
+
+        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+    }
+    else {
+        status = xTimerChangePeriod(me->timer, ticks, 0);
+        configASSERT(status == pdPASS);
+    }
 }
 
 /*..........................................................................*/
 void TimeEvent_disarm(TimeEvent * const me) {
-    taskENTER_CRITICAL();
-    me->timeout = 0U;
-    taskEXIT_CRITICAL();
+    BaseType_t xHigherPriorityTaskWoken;
+    BaseType_t status;
+
+    if (xPortIsInsideInterrupt() == pdTRUE) {
+        xHigherPriorityTaskWoken = pdFALSE;
+        status = xTimerStopFromISR(me->timer, &xHigherPriorityTaskWoken);
+        configASSERT(status == pdPASS);
+
+        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+    }
+    else {
+        status = xTimerStop(me->timer, 0);
+        configASSERT(status == pdPASS);
+    }
 }
 
 /*..........................................................................*/
-void TimeEvent_tickFromISR(BaseType_t *pxHigherPriorityTaskWoken) {
-    uint_fast8_t i;
-    for (i = 0U; i < l_tevtNum; ++i) {
-        TimeEvent * const t = l_tevt[i];
-        configASSERT(t); /* TimeEvent instance must be registered */
-        if (t->timeout > 0U) { /* is this TimeEvent armed? */
-            if (--t->timeout == 0U) { /* is it expiring now? */
-                Active_postFromISR(t->act, &t->super,
-                                   pxHigherPriorityTaskWoken);
-                t->timeout = t->interval; /* rearm or disarm (one-shot) */
-           }
-        }
-    }
+/* Use this macro to get the container of TimeEvent struct since xTimer pointing to timer_cb */
+#define GET_TIME_EVENT_HEAD(ptr)      (TimeEvent*)((uintptr_t)(ptr) - offsetof(TimeEvent, timer_cb))
+
+static void TimeEvent_callback(TimerHandle_t xTimer) {
+    TimeEvent * const t = GET_TIME_EVENT_HEAD(xTimer);      /* Also can use pvTimerGetTimerID(xTimer) */
+
+    /* Callback always called from non-interrupt context so no need to check xPortIsInsideInterrupt */
+    Active_post(t->act, &t->super);
 }
 
