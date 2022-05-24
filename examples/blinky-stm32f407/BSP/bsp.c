@@ -15,20 +15,20 @@
 #include "FreeAct.h" /* Free Active Object interface */
 #include "bsp.h"
 #include "stm32f4xx_hal.h"              // Keil::Device:STM32Cube HAL:Common
-#include "leds.h" 
+#include "leds.h"
 
 /* on-board LEDs */
-#define LED_RED_PORT   		(GPIOB)
-#define LED_GREEN_PORT  	(GPIOI)
-#define LED_YELLOW_PORT 	(GPIOG)
-#define LED_RED_PIN   		(GPIO_PIN_7)
-#define LED_GREEN_PIN  		(GPIO_PIN_7)
-#define LED_YELLOW_PIN 		(GPIO_PIN_11)
+#define LED_RED_PORT           (GPIOB)
+#define LED_GREEN_PORT      (GPIOI)
+#define LED_YELLOW_PORT     (GPIOG)
+#define LED_RED_PIN           (GPIO_PIN_7)
+#define LED_GREEN_PIN          (GPIO_PIN_7)
+#define LED_YELLOW_PIN         (GPIO_PIN_11)
 
 /* on-board switch */
-#define BTN_SW1						(1U >> 0U)
-#define BTN_SW1_PORT   		(GPIOD)
-#define BTN_SW1_PIN   		(GPIO_PIN_7)
+#define BTN_SW1                        (1U >> 0U)
+#define BTN_SW1_PORT           (GPIOD)
+#define BTN_SW1_PIN           (GPIO_PIN_7)
 
 /* Hooks ===================================================================*/
 /* Application hooks used in this project ==================================*/
@@ -52,7 +52,7 @@ void vApplicationTickHook(void) {
     * and Michael Barr, page 71.
     */
 //    current = ~GPIOF_AHB->DATA_Bits[BTN_SW1]; /* read SW1 */
-		current = HAL_GPIO_ReadPin(BTN_SW1_PORT, BTN_SW1_PIN);
+        current = HAL_GPIO_ReadPin(BTN_SW1_PORT, BTN_SW1_PIN);
     tmp = buttons.depressed; /* save the debounced depressed buttons */
     buttons.depressed |= (buttons.previous & current); /* set depressed */
     buttons.depressed &= (buttons.previous | current); /* clear released */
@@ -60,26 +60,26 @@ void vApplicationTickHook(void) {
     tmp ^= buttons.depressed;     /* changed debounced depressed */
 
     /* debounced SW1 state changed? */
-		if ((tmp & BTN_SW1) != 0U) {  
+        if ((tmp & BTN_SW1) != 0U) {
        /* is SW1 depressed? */
-			if ((buttons.depressed & BTN_SW1) != 0U) { 
-				/* post the "button-pressed" event from ISR */
-				static Event const buttonPressedEvt = {BUTTON_PRESSED_SIG};
-				Active_postFromISR(
-														AO_blinkyButton, 
-														&buttonPressedEvt,
-														&xHigherPriorityTaskWoken
-													);
+            if ((buttons.depressed & BTN_SW1) != 0U) {
+                /* post the "button-pressed" event from ISR */
+                static Event const buttonPressedEvt = {BUTTON_PRESSED_SIG};
+                Active_postFromISR(
+                                                        AO_blinkyButton,
+                                                        &buttonPressedEvt,
+                                                        &xHigherPriorityTaskWoken
+                                                    );
         }
         /* the button is released */
-				else { 
-				 /* post the "button-released" event from ISR */
-				 static Event const buttonReleasedEvt = {BUTTON_RELEASED_SIG};
-				 Active_postFromISR(
-														AO_blinkyButton, 
-														&buttonReleasedEvt,
-														&xHigherPriorityTaskWoken
-													 );
+                else {
+                 /* post the "button-released" event from ISR */
+                 static Event const buttonReleasedEvt = {BUTTON_RELEASED_SIG};
+                 Active_postFromISR(
+                                                        AO_blinkyButton,
+                                                        &buttonReleasedEvt,
+                                                        &xHigherPriorityTaskWoken
+                                                     );
         }
     }
 
@@ -108,9 +108,9 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
 * the memory that is used by the Idle task.
 */
 void vApplicationGetIdleTaskMemory(
-																		StaticTask_t **ppxIdleTaskTCBBuffer,
-																		StackType_t **ppxIdleTaskStackBuffer,
-																		uint32_t *pulIdleTaskStackSize 
+                                                                        StaticTask_t **ppxIdleTaskTCBBuffer,
+                                                                        StackType_t **ppxIdleTaskStackBuffer,
+                                                                        uint32_t *pulIdleTaskStackSize
 )
 {
     /* If the buffers to be provided to the Idle task are declared inside
@@ -137,45 +137,45 @@ void vApplicationGetIdleTaskMemory(
 
 /* BSP functions ===========================================================*/
 void BSP_init(void) {
-	/**/
-	LEDS_init();
+    /**/
+    LEDS_init();
 
 }
 /*..........................................................................*/
 void BSP_led0_off(void) {
-	HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_RESET);
 }
 /*..........................................................................*/
 void BSP_led0_on(void) {
-	HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_SET);
 }
 /*..........................................................................*/
 void BSP_led1_off(void) {
-	HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_RESET);
 }
 /*..........................................................................*/
 void BSP_led1_on(void) {
-	HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_SET);
 }
 /*..........................................................................*/
 void BSP_led2_off(void) {
-	HAL_GPIO_WritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, GPIO_PIN_RESET);
 }
 /*..........................................................................*/
 void BSP_led2_on(void) {
-	HAL_GPIO_WritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, GPIO_PIN_SET);
 }
 /*..........................................................................*/
 void BSP_led0_toggle(void){
-	HAL_GPIO_TogglePin(LED_RED_PORT, LED_RED_PIN);
+    HAL_GPIO_TogglePin(LED_RED_PORT, LED_RED_PIN);
 }
 /*..........................................................................*/
 void BSP_led1_toggle(void){
-	HAL_GPIO_TogglePin(LED_GREEN_PORT, LED_GREEN_PIN);
+    HAL_GPIO_TogglePin(LED_GREEN_PORT, LED_GREEN_PIN);
 }
 /*..........................................................................*/
 void BSP_led2_toggle(void){
-	HAL_GPIO_TogglePin(LED_YELLOW_PORT, LED_YELLOW_PIN);
+    HAL_GPIO_TogglePin(LED_YELLOW_PORT, LED_YELLOW_PIN);
 }
 /*..........................................................................*/
 void BSP_start(void) {
@@ -200,9 +200,9 @@ void Q_onAssert(char const *module, int loc) {
     (void)loc;
 #ifndef NDEBUG /* debug build? */
     /* light-up all LEDs */
-		HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LED_RED_PORT, LED_RED_PIN, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, GPIO_PIN_RESET);
 
     /* tie the CPU in this endless loop and wait for the debugger... */
     while (1) {

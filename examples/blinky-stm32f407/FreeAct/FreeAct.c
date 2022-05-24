@@ -81,7 +81,7 @@ void Active_start(Active * const me,
     me->queue = xQueueCreate(
                    queueLen,            /* queue length - provided by user */
                    sizeof(Event *)     /* item size */
-                   );      
+                   );
 //    me->thread = xTaskCreateStatic(
 //              &Active_eventLoop,        /* the thread function */
 //              "AO" ,                    /* the name of the task */
@@ -96,9 +96,9 @@ void Active_start(Active * const me,
               stk_depth,                /* stack depth */
               me,                       /* the 'pvParameters' parameter */
               prio + tskIDLE_PRIORITY,  /* FreeRTOS priority */
-              NULL);          
+              NULL);
 
-	 configASSERT(me->thread); /* thread must be created */
+     configASSERT(me->thread); /* thread must be created */
 }
 
 /*..........................................................................*/

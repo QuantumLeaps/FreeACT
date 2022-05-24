@@ -62,33 +62,33 @@ uint32_t counter1, counter2, counter3;
 
 /*vRed_Thread*/
 void vRed_Thread(void *pvParameters){
-	while(true){
-		counter1++;
-		RED_toggle();
-		vTaskDelay(pdMS_TO_TICKS(500));
-	}
+    while(true){
+        counter1++;
+        RED_toggle();
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
 }
 
 /**
 * \brief vGreen_Thread
 */
 void vGreen_Thread(void *pvParameters){
-	while(true){
-		counter2++;
-		GREEN_toggle();
-		vTaskDelay(pdMS_TO_TICKS(125));
-	}
+    while(true){
+        counter2++;
+        GREEN_toggle();
+        vTaskDelay(pdMS_TO_TICKS(125));
+    }
 }
 
 /**
 * \brief vBlue_Thread
 */
 void vYellow_Thread(void *pvParameters){
-	while(true){
-		counter3++;
-		YELLOW_toggle();
-		vTaskDelay(pdMS_TO_TICKS(250));
-	}
+    while(true){
+        counter3++;
+        YELLOW_toggle();
+        vTaskDelay(pdMS_TO_TICKS(250));
+    }
 }
 
 
@@ -96,51 +96,51 @@ void vYellow_Thread(void *pvParameters){
 /**
 * \fn main
 *
-* \brief 
+* \brief
 */
 int main(void){
-	static uint32_t freq = 0;
-	
-	/*Init BSP*/
-	LEDS_init();
-	
-	/*Init counters*/
-	counter1 = 0; 
-	counter2 = 0; 
-	counter3 = 0;
-	
-	/*OS*/
-	xTaskCreate(
-								vRed_Thread,
-								"Red Led Task",
-								100,
-								NULL,
-								1,
-								NULL							
-							);
-	xTaskCreate(
-								vGreen_Thread,
-								"Green Led Task",
-								100,
-								NULL,
-								1,
-								NULL							
-							);
-	xTaskCreate(
-								vYellow_Thread,
-								"Yellow Led Task",
-								100,
-								NULL,
-								1,
-								NULL							
-							);
+    static uint32_t freq = 0;
 
-	/*Init scheduler*/
-	vTaskStartScheduler();
+    /*Init BSP*/
+    LEDS_init();
 
-	/*Superloop - Unreachable*/
-	while(true){}
-	
+    /*Init counters*/
+    counter1 = 0;
+    counter2 = 0;
+    counter3 = 0;
+
+    /*OS*/
+    xTaskCreate(
+                                vRed_Thread,
+                                "Red Led Task",
+                                100,
+                                NULL,
+                                1,
+                                NULL
+                            );
+    xTaskCreate(
+                                vGreen_Thread,
+                                "Green Led Task",
+                                100,
+                                NULL,
+                                1,
+                                NULL
+                            );
+    xTaskCreate(
+                                vYellow_Thread,
+                                "Yellow Led Task",
+                                100,
+                                NULL,
+                                1,
+                                NULL
+                            );
+
+    /*Init scheduler*/
+    vTaskStartScheduler();
+
+    /*Superloop - Unreachable*/
+    while(true){}
+
 }
 #endif // USE_ACTIVE_OBJECTS
 
@@ -179,12 +179,12 @@ static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e
         case BUTTON_PRESSED_SIG: {
             BSP_led1_on();
             BSP_led2_off();
-						break;
+                        break;
         }
         case BUTTON_RELEASED_SIG: {
             BSP_led1_off();
             BSP_led2_on();
-						break;
+                        break;
         }
         default: {
             break;

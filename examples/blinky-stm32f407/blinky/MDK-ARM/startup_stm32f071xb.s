@@ -43,7 +43,7 @@
 ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Stack_Size		EQU     0x400
+Stack_Size        EQU     0x400
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size
@@ -101,7 +101,7 @@ __Vectors       DCD     __initial_sp                   ; Top of Stack
                 DCD     DMA1_Channel1_IRQHandler       ; DMA1 Channel 1
                 DCD     DMA1_Channel2_3_IRQHandler     ; DMA1 Channel 2 and Channel 3
                 DCD     DMA1_Channel4_5_6_7_IRQHandler ; DMA1 Channel 4, Channel 5, Channel 6 and Channel 7
-                DCD     ADC1_COMP_IRQHandler           ; ADC1, COMP1 and COMP2 
+                DCD     ADC1_COMP_IRQHandler           ; ADC1, COMP1 and COMP2
                 DCD     TIM1_BRK_UP_TRG_COM_IRQHandler ; TIM1 Break, Update, Trigger and Commutation
                 DCD     TIM1_CC_IRQHandler             ; TIM1 Capture Compare
                 DCD     TIM2_IRQHandler                ; TIM2
@@ -131,7 +131,7 @@ __Vectors_Size  EQU  __Vectors_End - __Vectors
 Reset_Handler    PROC
                  EXPORT  Reset_Handler                 [WEAK]
         IMPORT  __main
-        IMPORT  SystemInit  
+        IMPORT  SystemInit
                  LDR     R0, =SystemInit
                  BLX     R0
                  LDR     R0, =__main

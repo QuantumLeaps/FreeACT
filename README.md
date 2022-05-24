@@ -1,5 +1,8 @@
-![FreeACT](img/FreeACT.png)
+## Brought to you by:
+[![Quantum Leaps](https://www.state-machine.com/attachments/logo_ql_400.png)](https://www.state-machine.com)
 
+---------------------------------------------------------------------
+![FreeACT](img/FreeACT.png)
 
 # What is it?
 "FreeAct" is a minimal real-time embedded framework (RTEF) based on the
@@ -20,21 +23,21 @@ This presentation has been also made available on YouTube in the following playl
 
 ```
 FreeAct/
-+-3rd_party/       		- third-party software (needed in the examples)
-| +-FreeRTOS/      		- stripped down FreeRTOS 10.3.1 distribution
-| +-CMSIS/         		- ARM CMSIS
-| +-efm32pg1b/     		- low-level code to support the EFM32PG1B board
-| +-ek-tm4c123gxl/ 		- low-level code to support the EK-TM4C123GX board
++-3rd_party/               - third-party software (needed in the examples)
+| +-FreeRTOS/              - stripped down FreeRTOS 10.3.1 distribution
+| +-CMSIS/                 - ARM CMSIS
+| +-efm32pg1b/             - low-level code to support the EFM32PG1B board
+| +-ek-tm4c123gxl/         - low-level code to support the EK-TM4C123GX board
 |
 +-examples/
-| +-blinky-efm32/  		- Blinky-Button exammple for the EFM32PG1B board
-| +-blinky-efm32/  		- Blinky-Button exammple for the EK-TM4C123GX board
-| +-blinky-stm32f407/	- Blinky-Button example for the STM32F407 microcontroller with a custom board
+| +-blinky-efm32/          - Blinky-Button exammple for the EFM32PG1B board
+| +-blinky-efm32/          - Blinky-Button exammple for the EK-TM4C123GX board
+| +-blinky-stm32f407/    - Blinky-Button example for the STM32F407 microcontroller with a custom board
 |
-+-inc/             		- include directory
-| +-FreeAct.h      		- FreeAct interface
-+-src/             		- source directory
-| +-FreeAct.c      		- FreeAct implementation
++-inc/                     - include directory
+| +-FreeAct.h              - FreeAct interface
++-src/                     - source directory
+| +-FreeAct.c              - FreeAct implementation
 ```
 
 ---------------------------------------------------------------------

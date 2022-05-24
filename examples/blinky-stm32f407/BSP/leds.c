@@ -2,21 +2,21 @@
 #include "stm32f4xx_hal.h"              // Keil::Device:STM32Cube HAL:Common
 
 
-#define RED_Pin			GPIO_PIN_7
-#define GREEN_Pin		GPIO_PIN_7
-#define YELLOW_Pin		GPIO_PIN_11
+#define RED_Pin            GPIO_PIN_7
+#define GREEN_Pin        GPIO_PIN_7
+#define YELLOW_Pin        GPIO_PIN_11
 
-#define RED_Port		GPIOI
-#define GREEN_Port	GPIOB
-#define YELLOW_Port		GPIOG
+#define RED_Port        GPIOI
+#define GREEN_Port    GPIOB
+#define YELLOW_Port        GPIOG
 
-#define SW1					(1U >> 0U)
-#define SW1_PORT		GPIOD
-#define SW1_PIN			GIO_PIN_7
+#define SW1                    (1U >> 0U)
+#define SW1_PORT        GPIOD
+#define SW1_PIN            GIO_PIN_7
 
 void LEDS_init(void){
-	/**/
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
+    /**/
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOG_CLK_ENABLE();
@@ -63,13 +63,13 @@ void LEDS_init(void){
 
 }
 void RED_toggle(void){
-	HAL_GPIO_TogglePin(RED_Port, RED_Pin);
+    HAL_GPIO_TogglePin(RED_Port, RED_Pin);
 }
 void GREEN_toggle(void){
-	HAL_GPIO_TogglePin(GREEN_Port, GREEN_Pin);
+    HAL_GPIO_TogglePin(GREEN_Port, GREEN_Pin);
 }
 void YELLOW_toggle(void){
-	HAL_GPIO_TogglePin(YELLOW_Port, YELLOW_Pin);
+    HAL_GPIO_TogglePin(YELLOW_Port, YELLOW_Pin);
 }
 
 
