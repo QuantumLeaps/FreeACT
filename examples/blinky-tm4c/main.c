@@ -1,6 +1,6 @@
 /*****************************************************************************
 * Lab Project: BlinkyButton/Button with RTOS (FreeRTOS) and blocking
-* Board: EMF32-SLSTK3401A
+* Board: EK-TM4C123GXL
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -24,6 +24,9 @@ typedef struct {
     bool isLedOn;
 } BlinkyButton;
 
+/* Function Prototype ============================================================*/
+void BlinkyButton_ctor(BlinkyButton * const me);
+
 static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e) {
     switch (e->sig) {
         case INIT_SIG: /* intentionally fall through... */
@@ -31,12 +34,12 @@ static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e
             if (!me->isLedOn) { /* LED not on */
                 BSP_led0_on();
                 me->isLedOn = true;
-                TimeEvent_arm(&me->te, (200 / portTICK_RATE_MS), 0U);
+                TimeEvent_arm(&me->te, (200 / portTICK_RATE_MS));
             }
             else {  /* LED is on */
                 BSP_led0_off();
                 me->isLedOn = false;
-                TimeEvent_arm(&me->te, (800 / portTICK_RATE_MS), 0U);
+                TimeEvent_arm(&me->te, (800 / portTICK_RATE_MS));
             }
             break;
         }
@@ -55,6 +58,7 @@ static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e
 }
 void BlinkyButton_ctor(BlinkyButton * const me) {
     Active_ctor(&me->super, (DispatchHandler)&BlinkyButton_dispatch);
+    me->te.type = TYPE_ONE_SHOT;
     TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
     me->isLedOn = false;
 }
