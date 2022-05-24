@@ -76,11 +76,12 @@ struct Active {
 
 void Active_ctor(Active * const me, DispatchHandler dispatch);
 void Active_start(Active * const me,
-                  uint8_t prio,
+                  uint8_t prio,       /* priority (1-based) */
                   Event **queueSto,
                   uint32_t queueLen,
-                  StackType_t *stackSto,
-                  uint32_t stackDepth);
+                  void *stackSto,
+                  uint32_t stackSize,
+                  uint16_t opt);
 void Active_post(Active * const me, Event const * const e);
 void Active_postFromISR(Active * const me, Event const * const e,
                         BaseType_t *pxHigherPriorityTaskWoken);
@@ -102,5 +103,15 @@ void TimeEvent_disarm(TimeEvent * const me);
 
 /* static (i.e., class-wide) operation */
 void TimeEvent_tickFromISR(BaseType_t *pxHigherPriorityTaskWoken);
+
+/*---------------------------------------------------------------------------*/
+/* Assertion facilities... */
+
+#define Q_ASSERT(check_)                   \
+    if (!(check_)) {                       \
+        Q_onAssert(this_module, __LINE__); \
+    } else (void)0
+
+void Q_onAssert(char const *module, int loc);
 
 #endif /* FREE_ACT_H */

@@ -1,8 +1,18 @@
+![FreeACT](img/FreeACT.png)
+
+
 # What is it?
 "FreeAct" is a minimal real-time embedded framework (RTEF) based on the
 FreeRTOS kernel. FreeAct implemetns the Active Object design pattern.
 It was originally presented by Miro Samek at the
 [Embedded Online Conference 2020](https://www.embeddedonlineconference.com/session/Modern_Embedded_Software_Goes_Beyond_the_RTOS)
+
+[![Miro Samek at Embedded Online Conference](img/EOC_Miro.png)](https://www.embeddedonlineconference.com/session/Modern_Embedded_Software_Goes_Beyond_the_RTOS)
+
+
+This presentation has been also made available on YouTube in the following playlist:
+
+[![Beyond the RTOS on YouTube](img/Beyond_the_RTOS.jpg)](https://www.youtube.com/playlist?list=PLPW8O6W-1chytjkg63-tM7MI0BvGxxPIP)
 
 
 ---------------------------------------------------------------------
@@ -29,8 +39,13 @@ FreeAct/
 
 ---------------------------------------------------------------------
 # Licensing
-FreeAct is licensed under the MIT open source license, which is the same
+FreeAct is [licensed](LICENSE.txt) under the MIT open source license, which is the same
 used in FreeRTOS.
+
+
+---------------------------------------------------------------------
+# Comments/Discussion
+If you'd like to discuss FreeAct or related subjects, plese use the ["Issues" tab](https://github.com/QuantumLeaps/FreeAct/issues).
 
 
 ---------------------------------------------------------------------
