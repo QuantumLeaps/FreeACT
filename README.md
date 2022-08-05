@@ -1,8 +1,9 @@
 ## Brought to you by:
 [![Quantum Leaps](https://www.state-machine.com/attachments/logo_ql_400.png)](https://www.state-machine.com)
 
----------------------------------------------------------------------
+--------------------------------------------------------------------------
 ![FreeACT](img/FreeACT.png)
+
 
 # What is it?
 "FreeAct" is a minimal real-time embedded framework (RTEF) based on the
@@ -18,7 +19,6 @@ This presentation has been also made available on YouTube in the following playl
 [![Beyond the RTOS on YouTube](img/Beyond_the_RTOS.jpg)](https://www.youtube.com/playlist?list=PLPW8O6W-1chytjkg63-tM7MI0BvGxxPIP)
 
 
----------------------------------------------------------------------
 # Directories and Files
 
 ```
@@ -31,8 +31,8 @@ FreeAct/
 |
 +-examples/
 | +-blinky-efm32/          - Blinky-Button exammple for the EFM32PG1B board
-| +-blinky-efm32/          - Blinky-Button exammple for the EK-TM4C123GX board
-| +-blinky-stm32f407/    - Blinky-Button example for the STM32F407 microcontroller with a custom board
+| +-blinky-tm4c/           - Blinky-Button exammple for the EK-TM4C123GX board
+| +-blinky-stm32f407/      - Blinky-Button example for the STM32F407 microcontroller with a custom board
 |
 +-inc/                     - include directory
 | +-FreeAct.h              - FreeAct interface
@@ -40,18 +40,21 @@ FreeAct/
 | +-FreeAct.c              - FreeAct implementation
 ```
 
----------------------------------------------------------------------
 # Licensing
 FreeAct is [licensed](LICENSE.txt) under the MIT open source license, which is the same
 used in FreeRTOS.
 
 
----------------------------------------------------------------------
 # Comments/Discussion
 If you'd like to discuss FreeAct or related subjects, plese use the ["Issues" tab](https://github.com/QuantumLeaps/FreeAct/issues).
 
 
----------------------------------------------------------------------
+# How to Help this Project?
+If you like this project, please give it a star (in the upper-right corner of your browser window):
+
+![GitHub star](img/github-star.jpg)
+
+
 # Contact Information
 
 [state-machine.com](https://www.state-machine.com)
