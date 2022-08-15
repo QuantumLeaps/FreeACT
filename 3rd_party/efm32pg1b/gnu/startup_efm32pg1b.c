@@ -1,8 +1,14 @@
-/* File: startup_efm32pg1b.c
- * Purpose: startup file for EFM32PG1B devices.
+/* File: startup_efm32pg1b.c for GNU-ARM
+ * Purpose: startup file for TM4C123GH6PM Cortex-M4 device.
  *          Should be used with GCC 'GNU Tools ARM Embedded'
  * Version: CMSIS 5.0.1
  * Date: 2017-09-13
+ *
+ * Modified by Quantum Leaps:
+ * - Added relocating of the Vector Table to free up the 256B region at 0x0
+ *   for NULL-pointer protection by the MPU.
+ * - Modified all exception handlers to branch to assert_failed()
+ *   instead of locking up the CPU inside an endless loop.
  *
  * Created from the CMSIS template for the specified device
  * Quantum Leaps, www.state-machine.com
@@ -14,32 +20,6 @@
  * assembly to re-set the stack pointer, in case it is corrupted by the
  * time assert_failed is called.
  */
-/* Copyright (c) 2011 - 2014 ARM LIMITED
-
-   All rights reserved.
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are met:
-   - Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-   - Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-   - Neither the name of ARM nor the names of its contributors may be used
-     to endorse or promote products derived from this software without
-     specific prior written permission.
-   *
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
-   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-   POSSIBILITY OF SUCH DAMAGE.
- ---------------------------------------------------------------------------*/
 
 /* start and end of stack defined in the linker script ---------------------*/
 /*extern int __stack_start__;*/
@@ -61,8 +41,6 @@ void assert_failed(char const *module, int loc);
 void Default_Handler(void);  /* Default empty handler */
 void Reset_Handler(void);    /* Reset Handler */
 void SystemInit(void);       /* CMSIS system initialization */
-__attribute__ ((noreturn))
-void Q_onAssert(char const *module, int loc); /* QP assertion handler */
 
 /*----------------------------------------------------------------------------
 * weak aliases for each Exception handler to the Default_Handler.
@@ -110,6 +88,7 @@ void FPUEH_IRQHandler      (void) __attribute__ ((weak, alias("Default_Handler")
 /*..........................................................................*/
 __attribute__ ((section(".isr_vector")))
 int const g_pfnVectors[] = {
+    /* Initial Vector Table before relocation */
     (int)&__stack_end__,          /* Top of Stack                    */
     (int)&Reset_Handler,          /* Reset Handler                   */
     (int)&NMI_Handler,            /* NMI Handler                     */
@@ -117,13 +96,37 @@ int const g_pfnVectors[] = {
     (int)&MemManage_Handler,      /* The MPU fault handler           */
     (int)&BusFault_Handler,       /* The bus fault handler           */
     (int)&UsageFault_Handler,     /* The usage fault handler         */
-    0,                            /* Reserved                        */
-    0,                            /* Reserved                        */
-    0,                            /* Reserved                        */
-    0,                            /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
     (int)&SVC_Handler,            /* SVCall handler                  */
     (int)&DebugMon_Handler,       /* Debug monitor handler           */
-    0,                            /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&PendSV_Handler,         /* The PendSV handler              */
+    (int)&SysTick_Handler,        /* The SysTick handler             */
+    /* pad the initial VT to the total size of 256B */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
+    /* Relocated Vector Table beyond the 256B region around address 0.
+    * That region is used for NULL-pointer protection by the MPU.
+    */
+    (int)&__stack_end__,          /* Top of Stack                    */
+    (int)&Reset_Handler,          /* Reset Handler                   */
+    (int)&NMI_Handler,            /* NMI Handler                     */
+    (int)&HardFault_Handler,      /* Hard Fault Handler              */
+    (int)&MemManage_Handler,      /* The MPU fault handler           */
+    (int)&BusFault_Handler,       /* The bus fault handler           */
+    (int)&UsageFault_Handler,     /* The usage fault handler         */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&Default_Handler,        /* Reserved                        */
+    (int)&SVC_Handler,            /* SVCall handler                  */
+    (int)&DebugMon_Handler,       /* Debug monitor handler           */
+    (int)&Default_Handler,        /* Reserved                        */
     (int)&PendSV_Handler,         /* The PendSV handler              */
     (int)&SysTick_Handler,        /* The SysTick handler             */
 
@@ -166,6 +169,7 @@ int const g_pfnVectors[] = {
 
 
 /* reset handler -----------------------------------------------------------*/
+__attribute__((naked)) void Reset_Handler(void);
 void Reset_Handler(void) {
     extern int main(void);
     extern int __libc_init_array(void);
@@ -176,13 +180,16 @@ void Reset_Handler(void) {
     extern unsigned __bss_end__;   /* end of .bss in the linker script */
     extern void software_init_hook(void) __attribute__((weak));
 
-    unsigned const *src;
-    unsigned *dst;
+    /* relocate the Vector Table to leave room for the NULL-pointer region
+    * System Control Block/Vector Table Offset Reg := relocated Vector Table
+    */
+    *(int const * volatile *)0xE000ED08 = &g_pfnVectors[256/sizeof(int)];
 
     SystemInit(); /* CMSIS system initialization */
 
     /* copy the data segment initializers from flash to RAM... */
-    src = &__data_load;
+    unsigned const *src = &__data_load;
+    unsigned *dst;
     for (dst = &__data_start; dst < &__data_end__; ++dst, ++src) {
         *dst = *src;
     }
@@ -198,102 +205,55 @@ void Reset_Handler(void) {
         software_init_hook(); /* this will also call __libc_init_array */
     }
     else {
-        /* call all static constructors in C++ (comment out in C programs) */
-        //__libc_init_array();
+        /* call all static constructors in C++ (harmless in C programs) */
+        __libc_init_array();
         (void)main(); /* application's entry point; should never return! */
     }
 
     /* the previous code should not return, but assert just in case... */
-    assert_failed("Reset_Handler", __LINE__);
+    assert_failed("Reset_Handler", 1U);
 }
 
 
 /* fault exception handlers ------------------------------------------------*/
 __attribute__((naked)) void NMI_Handler(void);
 void NMI_Handler(void) {
-    __asm volatile (
-        "    ldr r0,=str_nmi\n\t"
-        "    mov r1,#1\n\t"
-        "    b assert_failed\n\t"
-        "str_nmi: .asciz \"NMI\"\n\t"
-        "  .align 2\n\t"
-    );
-}
-/*..........................................................................*/
-__attribute__((naked)) void MemManage_Handler(void);
-void MemManage_Handler(void) {
-    __asm volatile (
-        "    ldr r0,=str_mem\n\t"
-        "    mov r1,#1\n\t"
-        "    b assert_failed\n\t"
-        "str_mem: .asciz \"MemManage\"\n\t"
-        "  .align 2\n\t"
-    );
+    /* reset the SP to the initial value in case of stack overflow */
+    __asm volatile ("  MOV  sp,%0" : : "r" (&__stack_end__));
+    assert_failed("NMI_Handler", 1U);
 }
 /*..........................................................................*/
 __attribute__((naked)) void HardFault_Handler(void);
 void HardFault_Handler(void) {
-    __asm volatile (
-        "    ldr r0,=str_hrd\n\t"
-        "    mov r1,#1\n\t"
-        "    b assert_failed\n\t"
-        "str_hrd: .asciz \"HardFault\"\n\t"
-        "  .align 2\n\t"
-    );
+    /* reset the SP to the initial value in case of stack overflow */
+    __asm volatile ("  MOV  sp,%0" : : "r" (&__stack_end__));
+    assert_failed("HardFault_Handler", 1U);
+}
+/*..........................................................................*/
+__attribute__((naked)) void MemManage_Handler(void);
+void MemManage_Handler(void) {
+    /* reset the SP to the initial value in case of stack overflow */
+    __asm volatile ("  MOV  sp,%0" : : "r" (&__stack_end__));
+    assert_failed("MemManage_Handler", 1U);
 }
 /*..........................................................................*/
 __attribute__((naked)) void BusFault_Handler(void);
 void BusFault_Handler(void) {
-    __asm volatile (
-        "    ldr r0,=str_bus\n\t"
-        "    mov r1,#1\n\t"
-        "    b assert_failed\n\t"
-        "str_bus: .asciz \"BusFault\"\n\t"
-        "  .align 2\n\t"
-    );
+    /* reset the SP to the initial value in case of stack overflow */
+    __asm volatile ("  MOV  sp,%0" : : "r" (&__stack_end__));
+    assert_failed("MemManage_Handler", 1U);
 }
 /*..........................................................................*/
 __attribute__((naked)) void UsageFault_Handler(void);
 void UsageFault_Handler(void) {
-    __asm volatile (
-        "    ldr r0,=str_usage\n\t"
-        "    mov r1,#1\n\t"
-        "    b assert_failed\n\t"
-        "str_usage: .asciz \"UsageFault\"\n\t"
-        "  .align 2\n\t"
-    );
+    /* reset the SP to the initial value in case of stack overflow */
+    __asm volatile ("  MOV  sp,%0" : : "r" (&__stack_end__));
+    assert_failed("BusFault_Handler", 1U);
 }
 /*..........................................................................*/
 __attribute__((naked)) void Default_Handler(void);
 void Default_Handler(void) {
-    __asm volatile (
-        "    ldr r0,=str_dflt\n\t"
-        "    mov r1,#1\n\t"
-        "    b assert_failed\n\t"
-        "str_dflt: .asciz \"Default\"\n\t"
-        "  .align 2\n\t"
-    );
+    /* reset the SP to the initial value in case of stack overflow */
+    __asm volatile ("  MOV  sp,%0" : : "r" (&__stack_end__));
+    assert_failed("Default_Handler", 1U);
 }
-
-
-/*****************************************************************************
-* The function assert_failed defines the error/assertion handling policy
-* for the application. After making sure that the stack is OK, this function
-* calls Q_onAssert, which should NOT return (typically reset the CPU).
-*
-* NOTE: the function Q_onAssert should NOT return.
-*****************************************************************************/
-__attribute__ ((naked, noreturn))
-void assert_failed(char const *module, int loc) {
-    /* re-set the SP in case of stack overflow */
-    __asm volatile (
-        "  MOV sp,%0\n\t"
-        : : "r" (&__stack_end__));
-
-    Q_onAssert(module, loc); /* call the application-specific QP handler */
-
-    for (;;) { /* should not be reached, but just in case loop forever... */
-    }
-}
-
-/****** End Of File *********************************************************/

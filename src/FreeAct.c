@@ -39,7 +39,7 @@ void Active_ctor(Active * const me, DispatchHandler dispatch) {
 }
 
 /*..........................................................................*/
-/* Event-loop thread function for all Active Objects (FreeRTOS task signature) */
+/* thread function for all Active Objects (FreeRTOS task signature) */
 static void Active_eventLoop(void *pvParameters) {
     Active *me = (Active *)pvParameters;
     static Event const initEvt = { INIT_SIG };
@@ -50,10 +50,11 @@ static void Active_eventLoop(void *pvParameters) {
     (*me->dispatch)(me, &initEvt);
 
     for (;;) {   /* for-ever "superloop" */
-        Event *e; /* pointer to event object ("message") */
+        Event const *e; /* pointer to event object ("message") */
 
         /* wait for any event and receive it into object 'e' */
         xQueueReceive(me->queue, &e, portMAX_DELAY); /* BLOCKING! */
+        configASSERT(e != (Event const *)0);
 
         /* dispatch event to the active object 'me' */
         (*me->dispatch)(me, e); /* NO BLOCKING! */
@@ -138,7 +139,8 @@ void TimeEvent_arm(TimeEvent * const me, uint32_t millisec) {
     if (xPortIsInsideInterrupt() == pdTRUE) {
         xHigherPriorityTaskWoken = pdFALSE;
 
-        status = xTimerChangePeriodFromISR(me->timer, ticks, &xHigherPriorityTaskWoken);
+        status = xTimerChangePeriodFromISR(me->timer, ticks,
+                                           &xHigherPriorityTaskWoken);
         configASSERT(status == pdPASS);
 
         portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
@@ -168,13 +170,18 @@ void TimeEvent_disarm(TimeEvent * const me) {
 }
 
 /*..........................................................................*/
-/* Use this macro to get the container of TimeEvent struct since xTimer pointing to timer_cb */
-#define GET_TIME_EVENT_HEAD(ptr)      (TimeEvent*)((uintptr_t)(ptr) - offsetof(TimeEvent, timer_cb))
+/* Use this macro to get the container of TimeEvent struct
+ *  since xTimer pointing to timer_cb
+ */
+#define GET_TIME_EVENT_HEAD(ptr) \
+    (TimeEvent*)((uintptr_t)(ptr) - offsetof(TimeEvent, timer_cb))
 
 static void TimeEvent_callback(TimerHandle_t xTimer) {
-    TimeEvent * const t = GET_TIME_EVENT_HEAD(xTimer);      /* Also can use pvTimerGetTimerID(xTimer) */
+    /* Also can use pvTimerGetTimerID(xTimer) */
+    TimeEvent * const t = GET_TIME_EVENT_HEAD(xTimer);
 
-    /* Callback always called from non-interrupt context so no need to check xPortIsInsideInterrupt */
+    /* Callback always called from non-interrupt context so no need
+     * to check xPortIsInsideInterrupt
+     */
     Active_post(t->act, &t->super);
 }
-
