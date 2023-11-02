@@ -1,8 +1,8 @@
 ## Brought to you by:
 [![Quantum Leaps](https://www.state-machine.com/attachments/logo_ql_400.png)](https://www.state-machine.com)
+<hr>
 
---------------------------------------------------------------------------
-![FreeACT](img/FreeACT.png)
+<p align="center"><img src="img/FreeACT.png"/></p>
 
 - [What is it?](#what-is-it)
 - [Directories and Files](#directories-and-files)
@@ -13,7 +13,7 @@
 
 # What is it?
 "FreeACT" is a minimal real-time embedded framework (RTEF) based on the
-FreeRTOS kernel. FreeACT implemetns the Active Object (a.k.a. Actor) design pattern.
+FreeRTOS kernel. FreeACT implements the Active Object (a.k.a. Actor) design pattern.
 
 This presentation explaining "FreeACT" is available on YouTube in the following playlist:
 
@@ -37,7 +37,7 @@ FreeACT/
 |   +---nucleo-h743zi/   - low-level code to support the STM32 NUCLEO-H743ZI board
 |
 +---examples/
-|   +---blinky_button/   - Blinky-Button exammple with FreeAct
+|   +---blinky_button/   - Blinky-Button exammple with FreeACT
 |   |   +---armclang/    - projects for ARM/KEIL with "compiler 6" (armclang)
 |   |   |       efm32pg1b.uvprojx     - project for EFM32PG1B (Pearl Gecko) board
 |   |   |       ek-tm4c123gxl.uvprojx - project for EK-TM4C123GX (TivaC LaunchPad) board
@@ -66,7 +66,7 @@ The examples are provided for the following embedded boards:
 - **STM32 NUCLEO-H743ZI** (ARM Cortex-M7 with double-precision FPU)
 <p align="center"><img src="img/bd-NUCLEO-H743ZI.png"/></p>
 
-- other boards comong in the future...
+- other boards coming in the future...
 
 # Licensing
 FreeACT is [licensed](LICENSE.txt) under the MIT open source license, which is the same
@@ -74,14 +74,14 @@ used in FreeRTOS.
 
 
 # Invitation to Collaborate
-**This project welcomes collaboration!** Please help to improve FreeAct,
+**This project welcomes collaboration!** Please help to improve FreeACT,
 port it to other processors, integrate it with other embedded software,
 add interesting examples, etc. To avoid fragmentation, this repository is
-intended to remain the home of SST. To contribute, please clone, fork,
+intended to remain the home of FreeACT. To contribute, please clone, fork,
 and submit **pull requests** to incorporate your changes.
 
 
 # How to Help this Project?
 If you like this project, please give it a star (in the upper-right corner of your browser window):
 
-![GitHub star](img/github-star.jpg)
+<p align="center"><img src="img/github-star.jpg"/></p>

@@ -94,7 +94,7 @@ void Active_start(Active * const me,
 
 /*..........................................................................*/
 void Active_post(Active * const me, Event const * const e) {
-    BaseType_t status = xQueueSend(me->queue, (void *)&e, (TickType_t)0);
+    BaseType_t status = xQueueSendToBack(me->queue, (void *)&e, (TickType_t)0);
     configASSERT(status == pdTRUE);
 }
 
@@ -102,8 +102,8 @@ void Active_post(Active * const me, Event const * const e) {
 void Active_postFromISR(Active * const me, Event const * const e,
                         BaseType_t *pxHigherPriorityTaskWoken)
 {
-    BaseType_t status = xQueueSendFromISR(me->queue, (void *)&e,
-                                          pxHigherPriorityTaskWoken);
+    BaseType_t status = xQueueSendToBackFromISR(me->queue, (void *)&e,
+                                                pxHigherPriorityTaskWoken);
     configASSERT(status == pdTRUE);
 }
 
